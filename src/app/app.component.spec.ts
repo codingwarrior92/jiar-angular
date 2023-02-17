@@ -4,7 +4,7 @@ import { AppComponent } from './app.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CalendarModule, DateAdapter } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
-import { SchedulerModule } from 'angular-calendar-scheduler';
+import { SchedulerModule } from './scheduler/scheduler.module';
 import { AppService } from './services/app.service';
 import { LOCALE_ID } from '@angular/core';
 

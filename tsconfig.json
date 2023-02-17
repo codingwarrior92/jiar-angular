@@ -22,7 +22,9 @@
       "dom"
     ],
     "paths": {
-      "angular-calendar-scheduler": ["./lib/public_api"]
+      "tech-assessment": ["./lib/public_api"],
+      "@viacheslav/*": ["src/app/*"],
+      "@viacheslav/interface/*": ["src/app/interface/*"]
     }
   },
   "angularCompilerOptions": {

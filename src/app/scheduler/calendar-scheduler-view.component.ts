@@ -22,8 +22,6 @@ import {
     isBefore
 } from 'date-fns';
 import { ResizeEvent } from 'angular-resizable-element';
-// import { CalendarDragHelper } from 'angular-calendar/modules/common/calendar-drag-helper.provider';
-// import { CalendarResizeHelper } from 'angular-calendar/modules/common/calendar-resize-helper.provider';
 import { SchedulerConfig } from './scheduler-config';
 import { CalendarEventTimesChangedEventType, DateAdapter } from 'angular-calendar';
 import { DragMoveEvent, DragEndEvent, DropEvent } from 'angular-draggable-droppable';
@@ -60,17 +58,6 @@ import { CalendarSchedulerUtils } from './utils/calendar-scheduler-utils.provide
 import { CalendarResizeHelper } from '../common/temp/calendar-resize-helper.provider';
 import { CalendarDragHelper } from '../common/temp/calendar-drag-helper.provider';
 
-/**
- *  [ngClass]="getPositioningClasses(event)"
- *
- *  [style.top.px]="event.top"
- *  [style.height.px]="event.height"
- *  [style.left.%]="event.left"
- *  [style.width.%]="event.width"
- *
- *  DRAG & DROP & RESIZE -> https://github.com/mattlewis92/angular-calendar/blob/main/projects/angular-calendar/src/modules/week/calendar-week-view.component.ts
- *  FLEXBOX -> https://css-tricks.com/snippets/css/a-guide-to-flexbox/
- */
 @Component({
     selector: 'calendar-scheduler-view',
     template: `
@@ -577,8 +564,6 @@ export class CalendarSchedulerViewComponent implements OnInit, OnChanges, OnDest
         const oldViewDays: number = this._viewDays;
 
         if (this.responsive) {
-            // https://www.digitalocean.com/community/tutorials/angular-breakpoints-angular-cdk
-            // With a Component: https://www.digitalocean.com/community/tutorials/detect-responsive-screen-sizes-in-angular
             // check/set the size
             if (this.mobileQueryXs.matches) {
                 this.viewDays = 1;

@@ -1,9 +1,12 @@
 import { Component, OnInit, Inject, LOCALE_ID, HostListener, ViewChild } from '@angular/core';
-import { Subject } from 'rxjs';
-
+import { from, Subject } from 'rxjs';
+import { ProjectService } from '@viacheslav/project/state/project/project.service';
 import {
     endOfDay,
-    addMonths
+    addMonths,
+    addDays,
+    startOfHour,
+    addHours,
 } from 'date-fns';
 import {
     DAYS_IN_WEEK,
@@ -12,17 +15,19 @@ import {
     SchedulerViewHourSegment,
     CalendarSchedulerEvent,
     CalendarSchedulerEventAction,
+    SchedulerDateFormatter,
+    SchedulerEventTimesChangedEvent,
+    CalendarSchedulerViewComponent
+} from './scheduler/scheduler.module';
+import {
     startOfPeriod,
     endOfPeriod,
     addPeriod,
     subPeriod,
-    SchedulerDateFormatter,
-    SchedulerEventTimesChangedEvent,
-    CalendarSchedulerViewComponent
-} from 'angular-calendar-scheduler';
+} from './common/utils'
 import {
     CalendarView,
-    CalendarDateFormatter,
+    CalendarDateFormatter, 
     DateAdapter
 } from 'angular-calendar';
 
@@ -38,13 +43,13 @@ import { AppService } from './services/app.service';
     }]
 })
 export class AppComponent implements OnInit {
-    title: string = 'Angular Calendar Scheduler Demo';
-
+    title: string = 'Google Calendar Scheduler Demo';
+    selected: Date | null;
     CalendarView = CalendarView;
 
     view: CalendarView = CalendarView.Week;
     viewDate: Date = new Date();
-    viewDays: number = 3;
+    viewDays: number = 1;
     refresh: Subject<any> = new Subject();
     locale: string = 'en';
     hourSegments: number = 4;
@@ -61,6 +66,7 @@ export class AppComponent implements OnInit {
     hourModifier: Function;
     segmentModifier: Function;
     eventModifier: Function;
+    openDialog: Function;
     prevBtnDisabled: boolean = false;
     nextBtnDisabled: boolean = false;
 
@@ -70,6 +76,9 @@ export class AppComponent implements OnInit {
             label: '<span class="valign-center"><i class="material-icons md-18 md-red-500">cancel</i></span>',
             title: 'Delete',
             onClick: (event: CalendarSchedulerEvent): void => {
+                /////
+                this.appService.deleteEvent(this.actions, event.id)
+                    .then((events: CalendarSchedulerEvent[]) => this.events = events);
                 console.log('Pressed action \'Delete\' on event ' + event.id);
             }
         },
@@ -84,19 +93,19 @@ export class AppComponent implements OnInit {
     ];
 
     events: CalendarSchedulerEvent[];
-
     @ViewChild(CalendarSchedulerViewComponent) calendarScheduler: CalendarSchedulerViewComponent;
 
-    constructor(@Inject(LOCALE_ID) locale: string, private appService: AppService, private dateAdapter: DateAdapter) {
+    constructor(@Inject(LOCALE_ID) locale: string, private appService: AppService, private dateAdapter: DateAdapter, private _projectService: ProjectService) {
         this.locale = locale;
+        console.log({start: addDays(startOfHour(new Date()), 1),
+            end: addDays(addHours(startOfHour(new Date()), 1), 1),})
+        this.dayModifier = ((day: SchedulerViewDay): void => {
+            day.cssClass = this.isDateValid(day.date) ? '' : 'cal-disabled';
+        }).bind(this);
 
-        // this.dayModifier = ((day: SchedulerViewDay): void => {
-        //     day.cssClass = this.isDateValid(day.date) ? '' : 'cal-disabled';
-        // }).bind(this);
-
-        // this.hourModifier = ((hour: SchedulerViewHour): void => {
-        //     hour.cssClass = this.isDateValid(hour.date) ? '' : 'cal-disabled';
-        // }).bind(this);
+        this.hourModifier = ((hour: SchedulerViewHour): void => {
+            hour.cssClass = this.isDateValid(hour.date) ? '' : 'cal-disabled';
+        }).bind(this);
 
         this.segmentModifier = ((segment: SchedulerViewHourSegment): void => {
             segment.isDisabled = !this.isDateValid(segment.date);
@@ -110,8 +119,7 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.appService.getEvents(this.actions)
-            .then((events: CalendarSchedulerEvent[]) => this.events = events);
+        this._projectService.getProject();
     }
 
     viewDaysOptionChanged(viewDays: number): void {
@@ -184,3 +192,5 @@ export class AppComponent implements OnInit {
         this.refresh.next();
     }
 }
+
+
